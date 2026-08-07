@@ -80,12 +80,33 @@ $$
 adaptive-sampling-monitor/
 ├── README.md
 ├── README_zh-CN.md
-├── docs/                 # 历史记录、中文v1.0文档及英文对应版
-├── rtl/                  # 四个子模块和系统顶层
+├── docs/
+│   ├── original_v35_problem.md
+│   ├── original_v35_problem_EN.md
+│   ├── architecture_zh-CN.md
+│   ├── architecture_EN.md
+│   ├── design_intent_zh-CN.md
+│   ├── design_intent_EN.md
+│   ├── requirements_zh-CN.md
+│   ├── requirements_EN.md
+│   ├── timing_behavior_zh-CN.md
+│   ├── timing_behavior_EN.md
+│   ├── verification_plan_zh-CN.md
+│   └── verification_plan_EN.md
+├── rtl/
+│   ├── input_synchronizer.sv
+│   ├── event_detector.sv
+│   ├── phase_measurement.sv
+│   ├── register_interface.sv
+│   └── adaptive_sampling_monitor.sv
 └── tb/
     ├── adaptive_sampling_monitor_tb.sv
     ├── testcases/        # 预留给未来的数据驱动测试向量
-    └── unit/             # 四个模块级自检TB
+    └── unit/
+        ├── input_synchronizer_tb.sv
+        ├── event_detector_tb.sv
+        ├── phase_measurement_tb.sv
+        └── register_interface_tb.sv
 ```
 
 当前测试激励直接写在 SystemVerilog TB 中，因此 `tb/testcases/` 为空是有意保留的扩展位置。
@@ -94,12 +115,12 @@ adaptive-sampling-monitor/
 
 | 主题 | 中文 | 英文 |
 |---|---|---|
-| 历史问题记录 | [中文](docs/original_v35_problem.md) · [English](docs/original_v35_problem_EN.md) | 中文版是权威历史基线，英文版供英文读者理解项目来源。 |
-| 设计意图 | [design_intent.md](docs/design_intent_zh-CN.md) | [design_intent_en.md](docs/design_intent_EN.md) |
-| 需求规格 | [requirements.md](docs/requirements_zh-CN.md) | [requirements_en.md](docs/requirements_EN.md) |
-| 架构设计 | [architecture.md](docs/architecture_zh-CN.md) | [architecture_en.md](docs/architecture_EN.md) |
-| 时序行为 | [timing_behavior.md](docs/timing_behavior_zh-CN.md) | [timing_behavior_en.md](docs/timing_behavior_EN.md) |
-| 验证计划与结果 | [verification_plan.md](docs/verification_plan_zh-CN.md) | [verification_plan_en.md](docs/verification_plan_EN.md) |
+| 历史问题记录 | [original_v35_problem.md](docs/original_v35_problem.md) | [original_v35_problem_EN.md](docs/original_v35_problem_EN.md) |
+| 设计意图 | [design_intent_zh-CN.md](docs/design_intent_zh-CN.md) | [design_intent_EN.md](docs/design_intent_EN.md) |
+| 需求规格 | [requirements_zh-CN.md](docs/requirements_zh-CN.md) | [requirements_EN.md](docs/requirements_EN.md) |
+| 架构设计 | [architecture_zh-CN.md](docs/architecture_zh-CN.md) | [architecture_EN.md](docs/architecture_EN.md) |
+| 时序行为 | [timing_behavior_zh-CN.md](docs/timing_behavior_zh-CN.md) | [timing_behavior_EN.md](docs/timing_behavior_EN.md) |
+| 验证计划与结果 | [verification_plan_zh-CN.md](docs/verification_plan_zh-CN.md) | [verification_plan_EN.md](docs/verification_plan_EN.md) |
 
 ## 编译与运行
 
@@ -125,12 +146,7 @@ echo $?
 gtkwave adaptive_sampling_monitor_tb.vcd
 ```
 
-预期终端结果：
-
-```text
-PASS: adaptive_sampling_monitor completed 29 checks
-0
-```
+测试成功时，测试平台会输出 `PASS` 摘要，shell 会输出退出码 `0`。
 
 `PASS` 表示 TB 中实际执行的检查都满足了写入 TB 的预期；`echo $? = 0` 表示仿真进程向操作系统报告成功退出。二者都不能单独证明规格完整或全部输入已经覆盖，仍需结合波形核对和覆盖分析。
 
@@ -139,10 +155,10 @@ PASS: adaptive_sampling_monitor completed 29 checks
 | 测试平台 | 实际结果 | 已覆盖行为 |
 |---|---|---|
 | `input_synchronizer_tb.sv` | `PASS`，退出码 0 | 复位、两级传播、稳定输入、采样点间窄脉冲 |
-| `event_detector_tb.sv` | `PASS`，15 项检查 | 首样本基线、上升/下降/跳变、单拍输出 |
-| `phase_measurement_tb.sv` | `PASS`，12 项检查 | 启动、相位1和3、最近原点、同拍0、读清、重启、复位 |
-| `register_interface_tb.sv` | `PASS`，16 项检查 | 写1武装、写0启动、忙时拒绝、映射、复位 |
-| `adaptive_sampling_monitor_tb.sv` | `PASS`，29 项检查，退出码 0 | 相位1和0的完整链路、忙时拒绝、读清、最终复位 |
+| `event_detector_tb.sv` | `PASS` | 首样本基线、上升/下降/跳变、单拍输出 |
+| `phase_measurement_tb.sv` | `PASS` | 启动、相位1和3、最近原点、同拍0、读清、重启、复位 |
+| `register_interface_tb.sv` | `PASS` | 写1武装、写0启动、忙时拒绝、映射、复位 |
+| `adaptive_sampling_monitor_tb.sv` | `PASS`，退出码 0 | 相位1和0的完整链路、忙时拒绝、读清、最终复位 |
 
 关键波形已经人工核对。
 

@@ -85,16 +85,16 @@ adaptive-sampling-monitor/
 ├── docs/
 │   ├── original_v35_problem.md
 │   ├── original_v35_problem_EN.md
-│   ├── architecture.md
-│   ├── architecture_en.md
-│   ├── design_intent.md
-│   ├── design_intent_en.md
-│   ├── requirements.md
-│   ├── requirements_en.md
-│   ├── timing_behavior.md
-│   ├── timing_behavior_en.md
-│   ├── verification_plan.md
-│   └── verification_plan_en.md
+│   ├── architecture_zh-CN.md
+│   ├── architecture_EN.md
+│   ├── design_intent_zh-CN.md
+│   ├── design_intent_EN.md
+│   ├── requirements_zh-CN.md
+│   ├── requirements_EN.md
+│   ├── timing_behavior_zh-CN.md
+│   ├── timing_behavior_EN.md
+│   ├── verification_plan_zh-CN.md
+│   └── verification_plan_EN.md
 ├── rtl/
 │   ├── input_synchronizer.sv
 │   ├── event_detector.sv
@@ -117,12 +117,12 @@ adaptive-sampling-monitor/
 
 | Topic | Chinese | English |
 |---|---|---|
-| Historical problem record | [English](docs/original_v35_problem_EN.md) · [中文](docs/original_v35_problem.md) | The Chinese version remains the authoritative historical baseline. |
-| Design intent | [design_intent.md](docs/design_intent_zh-CN.md) | [design_intent_en.md](docs/design_intent_EN.md) |
-| Requirements | [requirements.md](docs/requirements_zh-CN.md) | [requirements_en.md](docs/requirements_EN.md) |
-| Architecture | [architecture.md](docs/architecture_zh-CN.md) | [architecture_en.md](docs/architecture_EN.md) |
-| Timing behavior | [timing_behavior.md](docs/timing_behavior_zh-CN.md) | [timing_behavior_en.md](docs/timing_behavior_EN.md) |
-| Verification plan and results | [verification_plan.md](docs/verification_plan_zh-CN.md) | [verification_plan_en.md](docs/verification_plan_EN.md) |
+| Historical problem record | [original_v35_problem.md](docs/original_v35_problem.md) | [original_v35_problem_EN.md](docs/original_v35_problem_EN.md) |
+| Design intent | [design_intent_zh-CN.md](docs/design_intent_zh-CN.md) | [design_intent_EN.md](docs/design_intent_EN.md) |
+| Requirements | [requirements_zh-CN.md](docs/requirements_zh-CN.md) | [requirements_EN.md](docs/requirements_EN.md) |
+| Architecture | [architecture_zh-CN.md](docs/architecture_zh-CN.md) | [architecture_EN.md](docs/architecture_EN.md) |
+| Timing behavior | [timing_behavior_zh-CN.md](docs/timing_behavior_zh-CN.md) | [timing_behavior_EN.md](docs/timing_behavior_EN.md) |
+| Verification plan and results | [verification_plan_zh-CN.md](docs/verification_plan_zh-CN.md) | [verification_plan_EN.md](docs/verification_plan_EN.md) |
 
 ## Build and run
 
@@ -154,12 +154,7 @@ echo $?
 gtkwave adaptive_sampling_monitor_tb.vcd
 ```
 
-Expected terminal result:
-
-```text
-PASS: adaptive_sampling_monitor completed 29 checks
-0
-```
+The testbench prints a `PASS` summary and the shell prints exit code `0` when the run succeeds.
 
 `PASS` means every expectation encoded in that testbench was satisfied. Exit code `0` means the simulation process reported success to the operating system. Neither result alone proves that the specification is complete; waveform review and coverage analysis remain separate evidence.
 
@@ -188,10 +183,10 @@ Use the corresponding RTL and testbench files for the other unit tests.
 | Testbench | Recorded result | Covered behavior |
 |---|---|---|
 | `input_synchronizer_tb.sv` | `PASS`, exit 0 | Reset, two-stage propagation, stable input, narrow inter-sample pulse |
-| `event_detector_tb.sv` | `PASS`, 15 checks | Baseline establishment, rise/fall/toggle detection, one-cycle pulses |
-| `phase_measurement_tb.sv` | `PASS`, 12 checks | Start, phases 1 and 3, origin replacement, same-cycle 0, read-clear, restart, reset |
-| `register_interface_tb.sv` | `PASS`, 16 checks | Arm/start sequence, busy rejection, mapping, reset |
-| `adaptive_sampling_monitor_tb.sv` | `PASS`, 29 checks, exit 0 | End-to-end phase 1 and phase 0 paths, busy rejection, read-clear, final reset |
+| `event_detector_tb.sv` | `PASS` | Baseline establishment, rise/fall/toggle detection, one-cycle pulses |
+| `phase_measurement_tb.sv` | `PASS` | Start, phases 1 and 3, origin replacement, same-cycle 0, read-clear, restart, reset |
+| `register_interface_tb.sv` | `PASS` | Arm/start sequence, busy rejection, mapping, reset |
+| `adaptive_sampling_monitor_tb.sv` | `PASS`, exit 0 | End-to-end phase 1 and phase 0 paths, busy rejection, read-clear, final reset |
 
 Key waveforms have also been manually inspected.
 
