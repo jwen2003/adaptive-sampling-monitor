@@ -1,8 +1,9 @@
 # V.35 Phase-Measurement Subsystem — Requirements
 
-Version: v1.0
+Document revision: v1.2
+RTL baseline: v1.0 (this documentation correction does not modify RTL)
 Status: Faithful-version requirements frozen and RTL-verified
-Date: 2026-08-07
+Date: 2026-08-20
 
 ## 1. Requirement classes
 
@@ -77,8 +78,14 @@ Date: 2026-08-07
 |---|---|---|
 | REQ-CPU-001 | Baseline | The CPU converts one result using `t = phase_result x 20 ns`. |
 | REQ-CPU-002 | Baseline | The CPU interprets `t` relative to the current V.35 period `T`. |
-| REQ-CPU-003 | Baseline | The faithful CPLD RTL performs no multi-sample averaging and does not select the edge itself. |
-| REQ-CPU-004 | Implementation decision | Gaps in special-rate regions use either nearest-region mapping or previous-selection retention, chosen consistently in software. |
+| REQ-CPU-003 | Baseline | After power-up or a frequency change, the CPU collects 10 valid results and computes the mean phase. |
+| REQ-CPU-004 | Baseline | Initial calibration selects falling for `0<t<T/4` or `3T/4<t<T`, and rising for `T/4<t<3T/4`. |
+| REQ-CPU-005 | Baseline | During operation, the CPU obtains one result at 1 s intervals and uses the mean of three results for periodic calibration. |
+| REQ-CPU-006 | Implementation decision | Periodic samples use non-overlapping batches; after every three results, software decides and starts a new batch. |
+| REQ-CPU-007 | Baseline | The periodic table may select rising, select falling, or retain the current edge; retain regions cause no switch. |
+| REQ-CPU-008 | Implementation decision | The undocumented intervals `4T/12<=t<=5T/12`, `7T/12<=t<=8T/12`, and all exact thresholds retain the current setting. |
+| REQ-CPU-009 | Baseline | Multi-sample scheduling, statistics, and TDMoP configuration remain outside the CPLD RTL. |
+| REQ-CPU-010 | Open | How frequency changes are detected and when the first periodic sample is taken. |
 
 ## 8. Error and enhancement boundary
 
@@ -108,6 +115,17 @@ The following self-checking simulations have run successfully:
 - Regression at 64 kHz, 2.048 MHz, and all nominal `N = 1..32` frequencies.
 - Directed testing near 10-bit wrap.
 - Long-duration missing-clock and missing-data stress.
-- Independent CPU `t/T` decision model.
+- Validation of the implemented CPU reference model against continuous phase logs from real hardware.
 - Target-device implementation, synchronizer attributes, board timing margin, and BER testing.
 - Extended-version timeout, saturation, boundary, and multiple-toggle behavior.
+
+## 11. CPU candidate-enhancement requirements
+
+| ID | Class | Requirement |
+|---|---|---|
+| REQ-CPU-011 | Candidate enhancement | Treat phase as a circular quantity to prevent the `0/T` wrap from corrupting the representative phase. |
+| REQ-CPU-012 | Candidate enhancement | Before publishing a circular decision, independently check circular concentration and normalized circular decision margin. |
+| REQ-CPU-013 | Candidate enhancement | If initial-calibration confidence is insufficient, publish no new edge and enter retry or failure handling. |
+| REQ-CPU-014 | Candidate enhancement | If periodic-calibration confidence is insufficient, retain the current edge. |
+| REQ-CPU-015 | Open | Concentration threshold, margin threshold, maximum retries, and maximum acceptable switching delay require real measurements and product requirements. |
+| REQ-CPU-016 | Boundary | The candidate CPU enhancement must not change the CPLD v1.0 single-result interface or value semantics. |

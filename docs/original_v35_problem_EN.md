@@ -164,7 +164,7 @@ The CPU first took 10 samples and calculated the mean phase $t$:
 
 ### 9.2 Periodic Remeasurement During Operation
 
-After the initial decision, the CPU sampled once per second and calculated the mean $t$ from three results. The intervals given near the end of the source were:
+After the initial decision, the CPU sampled once per second and calculated the mean $t$ from three results. Under the ordinary reading of that sentence, this project reconstructs the schedule as a 1 s sample interval with non-overlapping three-sample batches. The source itself did not explicitly distinguish among non-overlapping batches, a three-point sliding window, or three rapid samples per round. The intervals given near the end of the source were:
 
 | Mean phase interval | TDMoP sampling setting |
 |---|---|

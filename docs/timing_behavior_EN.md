@@ -1,8 +1,9 @@
 # V.35 Phase-Measurement Subsystem — Timing Behavior
 
-Version: v1.0
+Document revision: v1.2
+RTL baseline: v1.0 (this documentation correction does not modify RTL)
 Status: Faithful-version cycle semantics frozen and tested
-Date: 2026-08-07
+Date: 2026-08-20
 
 ## 1. Timing model
 
@@ -105,3 +106,19 @@ The faithful result width is 10 bits. Natural wrap is possible if a count were a
 Current simulations cover first-sample detector arming, one-cycle event pulses, phase results 1 and 3 at unit level, same-cycle phase 0, replacement by the latest origin, restart invalidation, read-clear, busy-write rejection, and synchronous reset. The integrated path covers phase 1 and phase 0 after four initialization cycles.
 
 Full nominal-frequency regression, long waits, physical implementation timing, and analog margin remain outside the completed v1.0 evidence.
+
+## 10. CPU decision timing boundary
+
+The CPU schedule is outside the 50 MHz cycle-by-cycle CPLD contract:
+
+1. after power-up or a frequency change, collect 10 valid single-transaction results;
+2. compute the initial statistic and configure the sampling edge;
+3. during operation, obtain approximately one valid result per second;
+4. form a non-overlapping batch of three results and make one periodic decision, approximately every 3 s;
+5. after each batch, clear the software accumulator and begin the next batch.
+
+The non-overlapping batch is a reconstruction decision based on the ordinary reading of the historical text. A sliding three-point window is not supported by the source. Neither software schedule changes the timing semantics of an individual CPLD result.
+
+## 11. Candidate confidence-gate timing
+
+The candidate confidence gate does not change a CPLD transaction. It changes whether the CPU accepts a completed batch and switches the sampling edge. In the directed dynamic scenarios, a fast unambiguous phase jump incurred no additional decision batches; a slow crossing added about two batches, or 6 s; and a noisy crossing added about four batches, or 12 s. These times come from constructed trajectories and the current schedule reconstruction; they are not product worst-case guarantees.

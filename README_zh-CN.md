@@ -8,9 +8,9 @@
 
 **忠实版 v1.0 已完成 RTL，并通过当前模块级和系统级仿真。**
 
-这里的“忠实版”是忠实于历史资料还原后、再经原工程师确认所冻结的工程行为，而不是机械复制旧 VHDL 或 Word 文档中的全部歧义。尤其是：当前 RTL 实现 CPU 控制的单次测量事务，不实现旧资料中属于 CPU 软件的 10 次或 3 次平均算法。
+这里的“忠实版”是忠实于历史资料还原后、再经原工程师确认所冻结的工程行为，而不是机械复制旧 VHDL 或 Word 文档中的全部歧义。当前 RTL 实现 CPU 控制的单次测量事务，不在硬件中实现多样本统计；原 CPU 软件在上电或频率变化后对 10 个结果求平均，运行期以 1 s 为采样间隔、累计 3 个结果求平均后裁定。
 
-拓展版尚未实现。超时、计数饱和、边界分类、多次跳变诊断和更广泛的回归测试仍属于后续工作。
+CPU 参考模型探索已经完成并冻结：历史 10/3 样本算法、圆周统计候选、置信门、门限扫描和动态跟踪均已有可执行模型。该软件探索不修改 CPLD v1.0。硬件拓展版仍未实现；超时、计数饱和、边界分类、多次跳变诊断和更广泛的 RTL 回归仍属于后续工作。
 
 ## 问题背景
 
@@ -19,7 +19,7 @@
 | 组成 | 职责 |
 |---|---|
 | CPLD | 旁路观察异步 RCLK 与 DATA，并报告离散相位。 |
-| CPU | 按当前 V.35 周期解释结果并选择采样沿。 |
+| CPU | 重复发起单次测量，完成 10 样本首次平均或 3 样本持续平均，再按当前 V.35 周期选择或保持采样沿。 |
 | TDMoP | 使用配置后的边沿真正采样业务数据。 |
 
 本仓库当前实现 CPLD 测量链和面向 CPU 的寄存器抽象。
@@ -80,12 +80,42 @@ $$
 adaptive-sampling-monitor/
 ├── README.md
 ├── README_zh-CN.md
-├── docs/                 # 历史记录、中文v1.0文档及英文对应版
-├── rtl/                  # 四个子模块和系统顶层
+├── docs/
+│   ├── original_v35_problem.md
+│   ├── original_v35_problem_EN.md
+│   ├── architecture_zh-CN.md
+│   ├── architecture_EN.md
+│   ├── design_intent_zh-CN.md
+│   ├── design_intent_EN.md
+│   ├── requirements_zh-CN.md
+│   ├── requirements_EN.md
+│   ├── timing_behavior_zh-CN.md
+│   ├── timing_behavior_EN.md
+│   ├── verification_plan_zh-CN.md
+│   ├── verification_plan_EN.md
+│   ├── cpu_algorithm_exploration_zh-CN.md
+│   └── cpu_algorithm_exploration_EN.md
+├── model/
+│   ├── cpu_model_spec.md
+│   ├── cpu_sampling_decision.py
+│   ├── compare_decision_algorithms.py
+│   ├── scan_decision_thresholds.py
+│   ├── simulate_guarded_controller.py
+│   └── simulate_dynamic_tracking.py
+├── rtl/
+│   ├── input_synchronizer.sv
+│   ├── event_detector.sv
+│   ├── phase_measurement.sv
+│   ├── register_interface.sv
+│   └── adaptive_sampling_monitor.sv
 └── tb/
     ├── adaptive_sampling_monitor_tb.sv
     ├── testcases/        # 预留给未来的数据驱动测试向量
-    └── unit/             # 四个模块级自检TB
+    └── unit/
+        ├── input_synchronizer_tb.sv
+        ├── event_detector_tb.sv
+        ├── phase_measurement_tb.sv
+        └── register_interface_tb.sv
 ```
 
 当前测试激励直接写在 SystemVerilog TB 中，因此 `tb/testcases/` 为空是有意保留的扩展位置。
@@ -94,12 +124,13 @@ adaptive-sampling-monitor/
 
 | 主题 | 中文 | 英文 |
 |---|---|---|
-| 历史问题记录 | [中文](docs/original_v35_problem.md) · [English](docs/original_v35_problem_EN.md) | 中文版是权威历史基线，英文版供英文读者理解项目来源。 |
-| 设计意图 | [design_intent.md](docs/design_intent_zh-CN.md) | [design_intent_en.md](docs/design_intent_EN.md) |
-| 需求规格 | [requirements.md](docs/requirements_zh-CN.md) | [requirements_en.md](docs/requirements_EN.md) |
-| 架构设计 | [architecture.md](docs/architecture_zh-CN.md) | [architecture_en.md](docs/architecture_EN.md) |
-| 时序行为 | [timing_behavior.md](docs/timing_behavior_zh-CN.md) | [timing_behavior_en.md](docs/timing_behavior_EN.md) |
-| 验证计划与结果 | [verification_plan.md](docs/verification_plan_zh-CN.md) | [verification_plan_en.md](docs/verification_plan_EN.md) |
+| 历史问题记录 | [original_v35_problem.md](docs/original_v35_problem.md) | [original_v35_problem_EN.md](docs/original_v35_problem_EN.md) |
+| 设计意图 | [design_intent_zh-CN.md](docs/design_intent_zh-CN.md) | [design_intent_EN.md](docs/design_intent_EN.md) |
+| 需求规格 | [requirements_zh-CN.md](docs/requirements_zh-CN.md) | [requirements_EN.md](docs/requirements_EN.md) |
+| 架构设计 | [architecture_zh-CN.md](docs/architecture_zh-CN.md) | [architecture_EN.md](docs/architecture_EN.md) |
+| 时序行为 | [timing_behavior_zh-CN.md](docs/timing_behavior_zh-CN.md) | [timing_behavior_EN.md](docs/timing_behavior_EN.md) |
+| 验证计划与结果 | [verification_plan_zh-CN.md](docs/verification_plan_zh-CN.md) | [verification_plan_EN.md](docs/verification_plan_EN.md) |
+| CPU 算法探索 | [cpu_algorithm_exploration_zh-CN.md](docs/cpu_algorithm_exploration_zh-CN.md) | [cpu_algorithm_exploration_EN.md](docs/cpu_algorithm_exploration_EN.md) |
 
 ## 编译与运行
 
@@ -125,12 +156,7 @@ echo $?
 gtkwave adaptive_sampling_monitor_tb.vcd
 ```
 
-预期终端结果：
-
-```text
-PASS: adaptive_sampling_monitor completed 29 checks
-0
-```
+测试成功时，测试平台会输出 `PASS` 摘要，shell 会输出退出码 `0`。
 
 `PASS` 表示 TB 中实际执行的检查都满足了写入 TB 的预期；`echo $? = 0` 表示仿真进程向操作系统报告成功退出。二者都不能单独证明规格完整或全部输入已经覆盖，仍需结合波形核对和覆盖分析。
 
@@ -139,10 +165,10 @@ PASS: adaptive_sampling_monitor completed 29 checks
 | 测试平台 | 实际结果 | 已覆盖行为 |
 |---|---|---|
 | `input_synchronizer_tb.sv` | `PASS`，退出码 0 | 复位、两级传播、稳定输入、采样点间窄脉冲 |
-| `event_detector_tb.sv` | `PASS`，15 项检查 | 首样本基线、上升/下降/跳变、单拍输出 |
-| `phase_measurement_tb.sv` | `PASS`，12 项检查 | 启动、相位1和3、最近原点、同拍0、读清、重启、复位 |
-| `register_interface_tb.sv` | `PASS`，16 项检查 | 写1武装、写0启动、忙时拒绝、映射、复位 |
-| `adaptive_sampling_monitor_tb.sv` | `PASS`，29 项检查，退出码 0 | 相位1和0的完整链路、忙时拒绝、读清、最终复位 |
+| `event_detector_tb.sv` | `PASS` | 首样本基线、上升/下降/跳变、单拍输出 |
+| `phase_measurement_tb.sv` | `PASS` | 启动、相位1和3、最近原点、同拍0、读清、重启、复位 |
+| `register_interface_tb.sv` | `PASS` | 写1武装、写0启动、忙时拒绝、映射、复位 |
+| `adaptive_sampling_monitor_tb.sv` | `PASS`，退出码 0 | 相位1和0的完整链路、忙时拒绝、读清、最终复位 |
 
 关键波形已经人工核对。
 
@@ -162,7 +188,7 @@ PASS: adaptive_sampling_monitor completed 29 checks
 - 64 kHz、2.048 MHz 和 `N=1..32` 全频点回归。
 - 接近 10 位计数回绕的定向测试。
 - 长期无时钟、长期无数据跳变压力测试。
-- CPU 侧 `t/T` 区间裁定参考程序。
+- 使用真实板上连续相位日志验证 CPU 参考模型，并据产品要求确定候选门限。
 
 ## 拓展版路线图
 
@@ -174,6 +200,6 @@ PASS: adaptive_sampling_monitor completed 29 checks
 4. 在 `tb/testcases/` 中加入数据驱动回归向量。
 5. 全频点回归与独立记分板。
 6. 目标 Lattice 器件约束、CDC 属性和时序审查。
-7. CPU 侧历史 `t/T` 区间裁定参考模型。
+7. 获得真实相位日志或产品时延要求后，重新评估候选 CPU 门限与失败恢复策略。
 
 拓展版应作为明确分层的新版本开发，不能让增强功能悄然改变已冻结的忠实版契约。
