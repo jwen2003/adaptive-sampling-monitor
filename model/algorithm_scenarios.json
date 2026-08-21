@@ -1,0 +1,86 @@
+{
+  "period_count": 120,
+  "scenarios": [
+    {
+      "name": "initial_stable_near_rising",
+      "description": "稳定聚集在上升沿附近，预期选择下降沿",
+      "stage": "initial",
+      "samples": [4, 5, 6, 5, 4, 6, 5, 5, 4, 6]
+    },
+    {
+      "name": "initial_stable_near_falling",
+      "description": "稳定聚集在半周期附近，预期选择上升沿",
+      "stage": "initial",
+      "samples": [58, 59, 60, 61, 62, 60, 59, 61, 60, 60]
+    },
+    {
+      "name": "initial_stable_near_period_end",
+      "description": "稳定聚集在周期末端，预期选择下降沿",
+      "stage": "initial",
+      "samples": [113, 114, 115, 116, 115, 114, 116, 115, 114, 115]
+    },
+    {
+      "name": "initial_quarter_boundary_jitter",
+      "description": "围绕 T/4 抖动，普通平均恰好命中未定义边界",
+      "stage": "initial",
+      "samples": [29, 31, 29, 31, 30, 30, 29, 31, 30, 30]
+    },
+    {
+      "name": "initial_wraparound_cluster",
+      "description": "样本物理上聚集在 0/T 两侧，用于暴露普通平均回绕错误",
+      "stage": "initial",
+      "samples": [1, 2, 1, 118, 119, 1, 2, 118, 119, 1]
+    },
+    {
+      "name": "initial_single_outlier",
+      "description": "九个样本靠近 T/4 下方，一个远端异常值把普通平均推过边界",
+      "stage": "initial",
+      "samples": [27, 27, 28, 27, 28, 27, 27, 28, 27, 90]
+    },
+    {
+      "name": "periodic_explicit_keep_region",
+      "description": "运行期样本位于原表明确保持区",
+      "stage": "periodic",
+      "current_edge": "falling",
+      "samples": [20, 21, 19]
+    },
+    {
+      "name": "periodic_undocumented_gap",
+      "description": "运行期样本位于 4T/12 到 5T/12 的原文空窗",
+      "stage": "periodic",
+      "current_edge": "falling",
+      "samples": [44, 45, 46]
+    },
+    {
+      "name": "initial_wide_dispersion",
+      "description": "样本近似覆盖整个周期，用于验证低集中度和圆周均值无可靠方向",
+      "stage": "initial",
+      "samples": [5, 17, 29, 41, 53, 65, 77, 89, 101, 113]
+    },
+    {
+      "name": "initial_opposite_bimodal",
+      "description": "样本形成相隔半周期的两个峰，用于验证圆周均值退化",
+      "stage": "initial",
+      "samples": [0, 1, 2, 59, 60, 61, 0, 60, 1, 61]
+    },
+    {
+      "name": "initial_high_concentration_low_margin",
+      "description": "样本高度集中但均值仅略高于 T/4，用于区分稳定度与决策裕量",
+      "stage": "initial",
+      "samples": [30, 30, 31, 30, 31, 30, 31, 30, 30, 31]
+    },
+    {
+      "name": "periodic_batches_near_threshold",
+      "description": "连续批次在 5T/12 阈值两侧波动，用于观察保持区是否抑制反复切换",
+      "stage": "periodic_sequence",
+      "current_edge": "falling",
+      "batches": [
+        [49, 50, 49],
+        [51, 52, 51],
+        [49, 50, 49],
+        [51, 50, 51],
+        [49, 49, 50]
+      ]
+    }
+  ]
+}

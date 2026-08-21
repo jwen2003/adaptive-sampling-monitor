@@ -1,14 +1,15 @@
 # V.35 Phase-Measurement Subsystem — Verification Plan and v1.0 Results
 
-Version: v1.0
+Document revision: v1.2
+RTL baseline: v1.0 (this documentation correction does not modify RTL)
 Status: Core faithful-version tests completed; planned coverage identified separately
-Date: 2026-08-07
+Date: 2026-08-20
 
 ## 1. Verification objective
 
 Verify that the faithful RTL implements the frozen discrete measurement contract, including synchronization structure, event formation, CPU start protocol, latest-origin counting, deterministic same-cycle behavior, result mapping, restart invalidation, read-clear, and synchronous reset.
 
-Digital simulation does not prove metastability probability, board-level margin, bit-error rate, or correctness of untested CPU decision software.
+Digital simulation does not prove metastability probability, board-level margin, bit-error rate, or the suitability of candidate CPU thresholds for a real product.
 
 ## 2. Frozen verification contract
 
@@ -114,7 +115,7 @@ Key waveforms were manually inspected. `PASS` establishes agreement with encoded
 - All 32 nominal V.35 frequencies and endpoint regression.
 - Directed near-wrap test for the 10-bit count.
 - Long missing-clock and missing-data stress.
-- Independent CPU region-decision model.
+- Validation of the implemented CPU reference model using continuous phase logs from real hardware.
 - Target-device synthesis, place-and-route, synchronizer attributes, and timing analysis.
 - Board measurement and BER validation.
 - Extended-version timeout, saturation, `boundary_flag`, and `multiple_toggle` behavior.
@@ -126,3 +127,24 @@ These items must remain labeled as plans rather than v1.0 results.
 The current milestone is accepted as: implemented RTL plus self-checking unit/integration simulations that pass the frozen core scenarios, with deterministic same-cycle semantics, latest-origin behavior, restart invalidation, read-clear, and reset confirmed.
 
 It is not accepted as proof of analog correctness, exhaustive frequency coverage, or production readiness.
+
+## 10. CPU decision reference tests
+
+The executable CPU model verifies that:
+
+1. initial calibration publishes no decision before 10 valid results;
+2. the 10-sample statistic follows the `T/4` and `3T/4` initial regions;
+3. periodic sampling uses 1 s intervals and non-overlapping batches of exactly three results;
+4. periodic decisions select rising, select falling, or retain the current edge according to the historical table;
+5. undocumented gaps and exact thresholds retain the current setting;
+6. a completed three-sample batch is cleared rather than becoming a sliding window;
+7. invalid results do not enter a batch, and a frequency change discards partial history;
+8. directed `0/T` distributions expose the physical error of an ordinary arithmetic mean.
+
+The first historical-algorithm test set contains 11 tests, all passing. The complete Python suite now contains 33 passing tests and additionally covers circular mean, concentration, ordinary and circular decision margins, threshold sweeps, guarded final actions, and dynamic tracking.
+
+## 11. CPU algorithm scenario status
+
+Covered scenarios include stable phase, `0/T` wrap, one distant sample, wide dispersion, opposite bimodality, high concentration with low margin, repeated threshold motion, slow crossing, fast jump, noisy crossing, and a transient crossing followed by retreat.
+
+The exploratory gate uses concentration at least `0.9` and normalized circular margin at least `0.025`. Passing these tests proves consistency with the reconstructed and exploratory rules only. It does not establish that these thresholds improve real-hardware BER or satisfy product response-time requirements.

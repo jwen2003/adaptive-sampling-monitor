@@ -8,9 +8,9 @@ A SystemVerilog reconstruction of a legacy CPLD subsystem that measures the disc
 
 **Faithful version v1.0 is implemented and has passed the current unit and end-to-end simulations.**
 
-“Faithful” means faithful to the behavior recovered from the legacy material and subsequently clarified with the original engineer. It does not mean mechanically reproducing every ambiguity in the old VHDL or Word document. In particular, the frozen RTL implements one CPU-controlled measurement transaction at a time; it does not implement the legacy document's CPU-side 10-sample or 3-sample averaging algorithm.
+“Faithful” means faithful to the engineering behavior recovered from the historical material and subsequently clarified with the original engineer. It does not mean mechanically reproducing every ambiguity in the old VHDL or Word document. In particular, the current RTL implements CPU-controlled single-measurement transactions; the historical CPU-side 10-sample and 3-sample averaging algorithms are not implemented in hardware.
 
-The extended version is not implemented yet. Timeout reporting, saturation handling, boundary classification, multiple-toggle detection, and broader regression remain future work.
+The CPU reference-model exploration is complete and frozen. Executable models now cover the historical 10/3-sample algorithm, a circular-statistics candidate, confidence gating, threshold sweeps, and dynamic tracking, without changing CPLD v1.0. Hardware timeout, counter saturation, boundary classification, multiple-toggle diagnostics, and broader RTL regression remain future work.
 
 ## Why this exists
 
@@ -19,7 +19,7 @@ The original product used a TDMoP device that sampled V.35 receive data on a sof
 | Component | Role |
 |---|---|
 | CPLD | Observe asynchronous RCLK and DATA, then report their discrete phase. |
-| CPU | Interpret the result relative to the V.35 period and select a sampling edge. |
+| CPU | Repeatedly start single measurements, form the 10-sample initial mean or 3-sample periodic mean, and select or retain an edge relative to the current V.35 period. |
 | TDMoP | Sample the actual traffic on the configured edge. |
 
 This repository currently implements the CPLD measurement path and its CPU-facing register abstraction.
@@ -82,33 +82,15 @@ If an asynchronous input is already high during reset, synchronizer filling can 
 
 ```text
 adaptive-sampling-monitor/
-├── docs/
-│   ├── original_v35_problem.md
-│   ├── original_v35_problem_EN.md
-│   ├── architecture_zh-CN.md
-│   ├── architecture_EN.md
-│   ├── design_intent_zh-CN.md
-│   ├── design_intent_EN.md
-│   ├── requirements_zh-CN.md
-│   ├── requirements_EN.md
-│   ├── timing_behavior_zh-CN.md
-│   ├── timing_behavior_EN.md
-│   ├── verification_plan_zh-CN.md
-│   └── verification_plan_EN.md
-├── rtl/
-│   ├── input_synchronizer.sv
-│   ├── event_detector.sv
-│   ├── phase_measurement.sv
-│   ├── register_interface.sv
-│   └── adaptive_sampling_monitor.sv
+├── README.md
+├── README_zh-CN.md
+├── docs/                 # Historical record and Chinese/English design documents
+├── model/                # CPU decision reference model and directed tests
+├── rtl/                  # Four submodules and the integrated top level
 └── tb/
     ├── adaptive_sampling_monitor_tb.sv
-    ├── testcases/
-    └── unit/
-        ├── input_synchronizer_tb.sv
-        ├── event_detector_tb.sv
-        ├── phase_measurement_tb.sv
-        └── register_interface_tb.sv
+    ├── testcases/        # Reserved for future data-driven test vectors
+    └── unit/             # Four self-checking unit testbenches
 ```
 
 `tb/testcases/` is reserved for future data-driven regression vectors. The current tests generate stimuli directly in SystemVerilog, so the folder is intentionally empty.
@@ -123,6 +105,7 @@ adaptive-sampling-monitor/
 | Architecture | [architecture_zh-CN.md](docs/architecture_zh-CN.md) | [architecture_EN.md](docs/architecture_EN.md) |
 | Timing behavior | [timing_behavior_zh-CN.md](docs/timing_behavior_zh-CN.md) | [timing_behavior_EN.md](docs/timing_behavior_EN.md) |
 | Verification plan and results | [verification_plan_zh-CN.md](docs/verification_plan_zh-CN.md) | [verification_plan_EN.md](docs/verification_plan_EN.md) |
+| CPU algorithm exploration | [cpu_algorithm_exploration_zh-CN.md](docs/cpu_algorithm_exploration_zh-CN.md) | [cpu_algorithm_exploration_EN.md](docs/cpu_algorithm_exploration_EN.md) |
 
 ## Build and run
 
@@ -155,6 +138,13 @@ gtkwave adaptive_sampling_monitor_tb.vcd
 ```
 
 The testbench prints a `PASS` summary and the shell prints exit code `0` when the run succeeds.
+
+Expected terminal output:
+
+```text
+PASS: adaptive_sampling_monitor completed 29 checks
+0
+```
 
 `PASS` means every expectation encoded in that testbench was satisfied. Exit code `0` means the simulation process reported success to the operating system. Neither result alone proves that the specification is complete; waveform review and coverage analysis remain separate evidence.
 
@@ -206,7 +196,18 @@ Key waveforms have also been manually inspected.
 - Full regression at 64 kHz, 2.048 MHz, and all nominal `N=1..32` frequencies.
 - Directed behavior near 10-bit counter wrap.
 - Long missing-clock and missing-data cases.
-- CPU-side `t/T` decision reference software.
+
+[CPU reference model verified]
+
+- No initial decision is published before 10 valid samples have been collected.
+- All three defined initial-calibration regions are covered.
+- Every three periodic samples form one non-overlapping batch.
+- Periodic switch regions, retain regions, undocumented gaps, and exact thresholds are covered.
+- Invalid results do not enter statistical batches; a frequency change clears history and restarts initial calibration.
+- A wrap-crossing distribution demonstrates how an arithmetic mean can be pulled incorrectly toward the middle of the period.
+- Circular mean, concentration, both legacy and circular decision margins, threshold sweeps, guarded final actions, and dynamic phase tracking are implemented.
+- The Python reference model currently passes 33 tests.
+- Exploration conclusions are frozen; candidate thresholds await real board data and product response requirements.
 
 ## Extended-version roadmap
 
@@ -218,6 +219,6 @@ Candidate work, not current functionality:
 4. Data-driven regression vectors under `tb/testcases/`.
 5. Full nominal-frequency regression and an independent scoreboard.
 6. Target-Lattice synthesis constraints, CDC attributes, and timing review.
-7. Optional CPU reference model for the legacy `t/T` decision regions.
+7. The historical CPU algorithm has an executable reconstruction; the circular-statistics candidate awaits real measurements and will not accumulate further statistical complexity meanwhile.
 
 The extended version should be developed as a separate, clearly labeled layer so that improvements do not silently change the frozen faithful-version contract.

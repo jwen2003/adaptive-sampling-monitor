@@ -1,8 +1,9 @@
 # V.35 Phase-Measurement Subsystem — Architecture
 
-Version: v1.0
+Document revision: v1.2
+RTL baseline: v1.0 (this documentation correction does not modify RTL)
 Status: Faithful-version RTL implemented and verified within the current scope
-Date: 2026-08-07
+Date: 2026-08-20
 
 ## 1. Purpose
 
@@ -16,9 +17,9 @@ In v1.0, the CPU starts one measurement by writing `1` and then `0` to `mem13[3]
 |---|---|
 | TDMoP | Receives the actual V.35 traffic and samples it on the selected edge. |
 | CPLD | Passively observes `v35_rclk` and `v35_data`, measures their discrete phase in the 50 MHz domain, and exposes the result to the CPU. |
-| CPU | Reads one result, interprets it using the legacy `t/T` regions, and configures the sampling edge. |
+| CPU | Repeats single measurements, forms the 10-sample initial or 3-sample periodic statistic, interprets it using the legacy `t/T` regions, and configures the sampling edge. |
 
-One readable result is one decision input. The faithful v1.0 RTL does not average multiple measurements.
+One readable result is one input sample to the software decision. The faithful v1.0 RTL does not average multiple measurements.
 
 ## 3. Clock domains and input paths
 
@@ -58,7 +59,8 @@ flowchart TD
     G["mem13 write 1 then 0"] --> H["One-cycle start pulse"]
     H --> D
     D --> E["Register mapping and external read-clear"]
-    E --> F["CPU selects edge from t/T"]
+    E --> F["CPU collects 10 or 3 results"]
+    F --> I["CPU selects or retains edge"]
 ```
 
 | Block | Primary responsibility |
@@ -142,3 +144,13 @@ This evidence shows conformance to the encoded v1.0 specification and covered sc
 2. Legacy register addresses and bus timing.
 3. Final CPU-to-TDMoP control path.
 4. Minimum valid input high/low time and minimum observable transition spacing.
+5. How the CPU detects a frequency change and re-enters the 10-sample initial calibration.
+6. Whether the first periodic sample is taken immediately after initialization or after the first 1 s interval.
+
+## 13. CPU reference enhancement architecture
+
+The CPU reference model adds a pure-software layer after the existing CPLD register interface. It repeatedly reads single results, performs circular statistics, checks circular concentration and normalized decision margin, and then chooses among configure, retain, or retry actions. This layer adds no CPLD state and does not change `phase_result`, `result_valid`, or the read-clear protocol.
+
+The legacy arithmetic mean and the candidate enhancement are retained side by side for regression comparison. The current schedule reconstruction uses 10 valid samples after power-up or a frequency change, followed by one result approximately every second and non-overlapping batches of three for periodic decisions. Because the source did not explicitly define batching, this is an implementation decision rather than a recovered historical fact.
+
+The exploratory gate uses concentration at least `0.9` and normalized circular margin at least `0.025`. These values are scenario-study parameters, not product requirements. The architectural conclusion is that the existing interface is sufficient for algorithm exploration, not that the candidate algorithm has become the product implementation.

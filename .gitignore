@@ -1,3 +1,86 @@
-build/
+# -----------------------------------------------------------------------------
+# Build and simulation output
+# -----------------------------------------------------------------------------
+/build/
+/obj_dir/
+
+# Waveform files are generated locally and can become large.
 *.vcd
+*.fst
+*.ghw
+*.lxt
+*.lxt2
+
+# Simulator coverage and runtime output
+coverage.dat
+*.coverage
+*.ucdb
+*.wlf
 *.log
+transcript
+
+# -----------------------------------------------------------------------------
+# Python reference-model cache and local environments
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+.venv/
+venv/
+env/
+
+# -----------------------------------------------------------------------------
+# Packaged intermediate deliveries
+# Keep source, tests, JSON scenarios, and generated Markdown reports tracked.
+# -----------------------------------------------------------------------------
+/v35_cpu_*.zip
+/v35_docs_*.zip
+
+# -----------------------------------------------------------------------------
+# Lattice Diamond generated implementation artifacts
+# Keep source project and constraint files such as .ldf, .lpf, .sdc, and RTL.
+# Place generated implementation output under build/ whenever possible.
+# -----------------------------------------------------------------------------
+*.jed
+*.bit
+*.svf
+*.rbt
+*.twr
+*.mrp
+*.par
+*.drc
+*.pad
+*.ncd
+*.ngd
+*.ngo
+*.bgn
+*.xpi
+automake.log
+
+# -----------------------------------------------------------------------------
+# Editor, operating-system, and temporary files
+# -----------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+~$*
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Windows shortcut and recycle-bin metadata
+*.lnk
+$RECYCLE.BIN/
+System Volume Information/
+
+# Private source material
+/reference/

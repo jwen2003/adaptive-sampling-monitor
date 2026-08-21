@@ -1,0 +1,36 @@
+{
+  "period_count": 120,
+  "batch_interval_seconds": 3,
+  "scenarios": [
+    {
+      "name": "slow_cross_to_rising",
+      "description": "当前为下降沿，相位缓慢跨过 5T/12 的上升沿切换边界",
+      "current_edge": "falling",
+      "batch_centers": [44, 47, 49, 51, 52, 54, 56]
+    },
+    {
+      "name": "slow_cross_to_falling",
+      "description": "当前为上升沿，相位缓慢跨过 T/12 的下降沿切换边界",
+      "current_edge": "rising",
+      "batch_centers": [16, 13, 11, 9, 8, 6, 4]
+    },
+    {
+      "name": "fast_jump_to_rising",
+      "description": "相位从保持区直接跳入具有明显裕量的上升沿区域",
+      "current_edge": "falling",
+      "batch_centers": [40, 60, 60, 60]
+    },
+    {
+      "name": "noisy_threshold_crossing",
+      "description": "相位在 5T/12 附近来回波动后继续深入上升沿区域",
+      "current_edge": "falling",
+      "batch_centers": [48, 49, 51, 49, 52, 50, 54, 56]
+    },
+    {
+      "name": "transient_cross_and_retreat",
+      "description": "相位短暂越过 5T/12 后退回，比较是否产生不可逆的提前切换",
+      "current_edge": "falling",
+      "batch_centers": [45, 48, 49, 51, 49, 47, 45]
+    }
+  ]
+}

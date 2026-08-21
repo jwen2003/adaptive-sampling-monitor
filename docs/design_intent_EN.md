@@ -1,8 +1,9 @@
 # V.35 Phase-Measurement Subsystem — Design Intent
 
-Version: v1.0
+Document revision: v1.2
+RTL baseline: v1.0 (this documentation correction does not modify RTL)
 Status: Faithful-version intent closed by RTL and tests
-Date: 2026-08-07
+Date: 2026-08-20
 
 ## 1. Problem
 
@@ -13,8 +14,8 @@ The CPLD does not receive the traffic on behalf of the TDMoP and does not autono
 ```mermaid
 flowchart TD
     A["CPU starts one measurement"] --> B["CPLD measures discrete t"]
-    B --> C["CPU evaluates t/T"]
-    C --> D["CPU selects the sampling edge"]
+    B --> C["CPU collects 10 or 3 results"]
+    C --> D["CPU selects or retains the sampling edge"]
     D --> E["TDMoP samples traffic"]
 ```
 
@@ -22,7 +23,7 @@ flowchart TD
 
 - Each receive-clock rising edge inside an active transaction establishes a new origin.
 - If DATA does not toggle for several receive-clock periods, every new RCLK edge still resets the phase count.
-- The CPU decides from each readable result; the faithful RTL does not implement 10-sample or 3-sample averaging.
+- The CPU reads individual results and forms the 10-sample or 3-sample statistic in software; the faithful RTL performs no multi-sample averaging.
 - An accepted `mem13[3]` write `1 -> 0` sequence produces exactly one 50 MHz `measurement_start` pulse.
 - Accepting a new start immediately clears the old valid state. A later result may overwrite an unread old numerical value.
 - Adjacent reference-clock samples produce phase 1, equivalent to 20 ns.
@@ -39,7 +40,7 @@ Synchronize both asynchronous inputs through identical two-stage paths; detect R
 
 ### CPU
 
-Start a transaction while idle, wait for completion, read and clear the result, convert `phase_result` into `t=phase_result x 20 ns`, apply the appropriate `t/T` decision regions, resolve region gaps using a fixed policy, and configure the TDMoP.
+Start transactions while idle, wait for each completion, read and clear each result, form the required 10-sample initial or 3-sample periodic statistic, apply the appropriate `t/T` decision regions, and configure or retain the TDMoP sampling edge.
 
 ### TDMoP
 
@@ -67,16 +68,34 @@ When RCLK rise and DATA toggle are observed in one 50 MHz cycle, the implementat
 
 ## 7. CPU edge decision
 
-[Established]
+### 7.1 Initial calibration
 
-- Each result is interpreted independently.
-- The decision uses `t` relative to one full V.35 period `T`.
-- The CPU selects the edge associated with the region nearest the measured phase.
-- The legacy special-rate regions contain gaps whose treatment was not functionally critical to the original system.
+After power-up or a frequency change, software collects 10 valid phase results and computes their arithmetic mean `t`:
 
-[Implementation choice still required]
+| Mean phase | Action |
+|---|---|
+| `0<t<T/4` | Select falling-edge sampling. |
+| `T/4<t<3T/4` | Select rising-edge sampling. |
+| `3T/4<t<T` | Select falling-edge sampling. |
 
-Software must either map a gap to the nearest neighboring region or retain the previous sampling-edge selection. Retaining the previous selection reduces oscillation; choosing the nearest region more closely follows the engineer's verbal description. Either choice must be fixed and tested before CPU reference software is considered complete.
+### 7.2 Periodic calibration
+
+During operation, software obtains one result at approximately 1 s intervals. This project reconstructs three non-overlapping results as one decision batch:
+
+| Mean phase | Action |
+|---|---|
+| `0<t<T/12` | Select falling-edge sampling. |
+| `T/12<t<4T/12` | Retain the current setting. |
+| `5T/12<t<7T/12` | Select rising-edge sampling. |
+| `8T/12<t<11T/12` | Retain the current setting. |
+| `11T/12<t<T` | Select falling-edge sampling. |
+
+### 7.3 Reconstruction decisions and open points
+
+- The phrase “sample once every 1 s and average three samples” is reconstructed as a 1 s interval and non-overlapping three-sample batches.
+- A three-point sliding window is not used because the source does not mention “the latest three” or sliding updates.
+- The undocumented intervals `4T/12<=t<=5T/12`, `7T/12<=t<=8T/12`, and all exact thresholds retain the current setting in the executable reference model.
+- Frequency-change detection and the start time of the first periodic sample remain unknown.
 
 ## 8. Result interface
 
@@ -114,7 +133,14 @@ The faithful version excludes timeout, saturation reporting, `boundary_flag`, `m
 2. Target Lattice device and synchronizer attributes.
 3. CPU-to-TDMoP control path.
 4. Exact software policy for gaps in the special-rate regions.
+5. Frequency-change detection and re-entry into initial calibration.
 
 ## 11. Completion statement
 
 All four functional blocks and the top-level integration have self-checking tests. Covered paths include initialization wait, start, busy-write rejection, phase 1, same-cycle phase 0, register mapping, read-clear, restart semantics, and synchronous reset. The reported `PASS`, zero process exit code, and reviewed waveforms support compliance with the encoded faithful-version scope; they do not prove physical timing margin or all operating points.
+
+## 12. CPU algorithm exploration decision
+
+The legacy arithmetic mean remains the compatibility reference, but directed scenarios demonstrate that it can misinterpret samples clustered across the `0/T` wrap. The candidate enhancement uses a circular mean and independently checks circular concentration and normalized distance to the nearest effective decision boundary.
+
+If confidence is insufficient during initial calibration, the candidate publishes no new edge and requests another calibration attempt. During periodic calibration, it retains the current edge. The exploratory values `concentration >= 0.9` and `circular margin / T >= 0.025` are comparison parameters only, not product requirements. See `cpu_algorithm_exploration_EN.md` for evidence, limitations, and resume conditions.
