@@ -1,6 +1,6 @@
 # CPU 动态相位跟踪结果
 
-`T=120`，每批约 `3` 秒；探索门限为集中度 ≥ `0.9`、圆周裕量/T ≥ `0.025`。
+$T = 120$，每批约 `3` 秒；探索门限为集中度 $\ge 0.9$、圆周裕量与 $T$ 的比值 $\ge 0.025$。
 
 | 场景 | 相位中心序列 | 原算法首次切换 | 带门限首次切换 | 延迟 |
 |---|---|---|---|---|
@@ -14,14 +14,14 @@
 
 ### slow_cross_to_rising
 
-当前为下降沿，相位缓慢跨过 5T/12 的上升沿切换边界
+当前为下降沿，相位缓慢跨过 $5T/12$ 的上升沿切换边界
 
 - 原算法：`falling -> falling -> falling -> rising -> rising -> rising -> rising`
 - 带门限：`falling -> falling -> falling -> falling -> falling -> rising -> rising`
 
 ### slow_cross_to_falling
 
-当前为上升沿，相位缓慢跨过 T/12 的下降沿切换边界
+当前为上升沿，相位缓慢跨过 $T/12$ 的下降沿切换边界
 
 - 原算法：`rising -> rising -> rising -> falling -> falling -> falling -> falling`
 - 带门限：`rising -> rising -> rising -> rising -> rising -> falling -> falling`
@@ -35,14 +35,14 @@
 
 ### noisy_threshold_crossing
 
-相位在 5T/12 附近来回波动后继续深入上升沿区域
+相位在 $5T/12$ 附近来回波动后继续深入上升沿区域
 
 - 原算法：`falling -> falling -> rising -> rising -> rising -> rising -> rising -> rising`
 - 带门限：`falling -> falling -> falling -> falling -> falling -> falling -> rising -> rising`
 
 ### transient_cross_and_retreat
 
-相位短暂越过 5T/12 后退回，比较是否产生不可逆的提前切换
+相位短暂越过 $5T/12$ 后退回，比较是否产生不可逆的提前切换
 
 - 原算法：`falling -> falling -> falling -> rising -> rising -> rising -> rising`
 - 带门限：`falling -> falling -> falling -> falling -> falling -> falling -> falling`

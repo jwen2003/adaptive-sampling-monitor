@@ -41,11 +41,11 @@ flowchart TD
 测量值是两个 50 MHz 观测事件的拍号差：
 
 $$
-C_{phase}=n_d-n_r
+C_{\mathrm{phase}} = n_d - n_r
 $$
 
 $$
-t=C_{phase}\times20\text{ ns}
+t = C_{\mathrm{phase}} \times 20\text{ ns}
 $$
 
 - CPU 在空闲时向 `mem13[3]` 写 1、再写 0，发起一次测量。
@@ -185,7 +185,7 @@ gtkwave adaptive_sampling_monitor_tb.vcd
 
 [尚未验证]
 
-- 64 kHz、2.048 MHz 和 `N=1..32` 全频点回归。
+- 64 kHz、2.048 MHz 和 $N = 1,\ldots,32$ 全频点回归。
 - 接近 10 位计数回绕的定向测试。
 - 长期无时钟、长期无数据跳变压力测试。
 - 使用真实板上连续相位日志验证 CPU 参考模型，并据产品要求确定候选门限。

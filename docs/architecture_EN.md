@@ -17,7 +17,7 @@ In v1.0, the CPU starts one measurement by writing `1` and then `0` to `mem13[3]
 |---|---|
 | TDMoP | Receives the actual V.35 traffic and samples it on the selected edge. |
 | CPLD | Passively observes `v35_rclk` and `v35_data`, measures their discrete phase in the 50 MHz domain, and exposes the result to the CPU. |
-| CPU | Repeats single measurements, forms the 10-sample initial or 3-sample periodic statistic, interprets it using the legacy `t/T` regions, and configures the sampling edge. |
+| CPU | Repeats single measurements, forms the 10-sample initial or 3-sample periodic statistic, interprets it using the legacy $t/T$ regions, and configures the sampling edge. |
 
 One readable result is one input sample to the software decision. The faithful v1.0 RTL does not average multiple measurements.
 
@@ -88,11 +88,11 @@ Writes during `measurement_busy=1` are rejected atomically: neither the visible 
 For an origin observed on cycle `n_r` and a DATA transition observed on cycle `n_d`:
 
 $$
-C_{phase}=n_d-n_r
+C_{\mathrm{phase}} = n_d - n_r
 $$
 
 $$
-t=C_{phase}\times20\text{ ns}
+t = C_{\mathrm{phase}} \times 20\text{ ns}
 $$
 
 | Event combination | Behavior |

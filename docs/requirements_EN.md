@@ -43,7 +43,7 @@ Date: 2026-08-20
 
 | ID | Class | Requirement |
 |---|---|---|
-| REQ-COUNT-001 | Baseline | `phase_result = n_d - n_r` in 50 MHz cycles. |
+| REQ-COUNT-001 | Baseline | `phase_result` equals $n_d - n_r$ in 50 MHz cycles. |
 | REQ-COUNT-002 | Baseline | Adjacent observed events return 1, corresponding to 20 ns. |
 | REQ-COUNT-003 | Baseline | Same-cycle RCLK and DATA events return 0 using the current RCLK as origin. |
 | REQ-COUNT-004 | Baseline | A new RCLK event has origin-update priority over normal count increment. |
@@ -76,14 +76,14 @@ Date: 2026-08-20
 
 | ID | Class | Requirement |
 |---|---|---|
-| REQ-CPU-001 | Baseline | The CPU converts one result using `t = phase_result x 20 ns`. |
+| REQ-CPU-001 | Baseline | The CPU computes $t$ by multiplying `phase_result` by $20\text{ ns}$. |
 | REQ-CPU-002 | Baseline | The CPU interprets `t` relative to the current V.35 period `T`. |
 | REQ-CPU-003 | Baseline | After power-up or a frequency change, the CPU collects 10 valid results and computes the mean phase. |
-| REQ-CPU-004 | Baseline | Initial calibration selects falling for `0<t<T/4` or `3T/4<t<T`, and rising for `T/4<t<3T/4`. |
+| REQ-CPU-004 | Baseline | Initial calibration selects falling for $0 < t < T/4$ or $3T/4 < t < T$, and rising for $T/4 < t < 3T/4$. |
 | REQ-CPU-005 | Baseline | During operation, the CPU obtains one result at 1 s intervals and uses the mean of three results for periodic calibration. |
 | REQ-CPU-006 | Implementation decision | Periodic samples use non-overlapping batches; after every three results, software decides and starts a new batch. |
 | REQ-CPU-007 | Baseline | The periodic table may select rising, select falling, or retain the current edge; retain regions cause no switch. |
-| REQ-CPU-008 | Implementation decision | The undocumented intervals `4T/12<=t<=5T/12`, `7T/12<=t<=8T/12`, and all exact thresholds retain the current setting. |
+| REQ-CPU-008 | Implementation decision | The undocumented intervals $4T/12 \le t \le 5T/12$, $7T/12 \le t \le 8T/12$, and all exact thresholds retain the current setting. |
 | REQ-CPU-009 | Baseline | Multi-sample scheduling, statistics, and TDMoP configuration remain outside the CPLD RTL. |
 | REQ-CPU-010 | Open | How frequency changes are detected and when the first periodic sample is taken. |
 
@@ -112,7 +112,7 @@ The following self-checking simulations have run successfully:
 
 ## 10. Planned but not completed coverage
 
-- Regression at 64 kHz, 2.048 MHz, and all nominal `N = 1..32` frequencies.
+- Regression at 64 kHz, 2.048 MHz, and all nominal $N = 1,\ldots,32$ frequencies.
 - Directed testing near 10-bit wrap.
 - Long-duration missing-clock and missing-data stress.
 - Validation of the implemented CPU reference model against continuous phase logs from real hardware.
@@ -123,7 +123,7 @@ The following self-checking simulations have run successfully:
 
 | ID | Class | Requirement |
 |---|---|---|
-| REQ-CPU-011 | Candidate enhancement | Treat phase as a circular quantity to prevent the `0/T` wrap from corrupting the representative phase. |
+| REQ-CPU-011 | Candidate enhancement | Treat phase as a circular quantity to prevent the $0/T$ wrap from corrupting the representative phase. |
 | REQ-CPU-012 | Candidate enhancement | Before publishing a circular decision, independently check circular concentration and normalized circular decision margin. |
 | REQ-CPU-013 | Candidate enhancement | If initial-calibration confidence is insufficient, publish no new edge and enter retry or failure handling. |
 | REQ-CPU-014 | Candidate enhancement | If periodic-calibration confidence is insufficient, retain the current edge. |

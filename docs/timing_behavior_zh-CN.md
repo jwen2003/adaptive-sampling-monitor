@@ -56,11 +56,11 @@ RTL 基线：v1.0（本次勘误不修改 RTL）
 设接收时钟事件出现在拍 `n_r`，本周期第一次数据事件出现在拍 `n_d`：
 
 $$
-C_{phase}=n_d-n_r
+C_{\mathrm{phase}} = n_d - n_r
 $$
 
 $$
-t=C_{phase}\times20\text{ ns}
+t = C_{\mathrm{phase}} \times 20\text{ ns}
 $$
 
 示例：
