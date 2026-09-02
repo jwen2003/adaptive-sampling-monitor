@@ -29,7 +29,7 @@ The device provided:
 The source described V.35 as a general-purpose terminal interface specification for synchronous data transmission. The device supported the following system-clock frequencies:
 
 $$
-f_{\mathrm{V35}}=N\times64\ \mathrm{kHz},\qquad N=1,2,\ldots,32
+f_{\mathrm{V35}} = N \times 64\ \mathrm{kHz},\qquad N = 1,2,\ldots,32
 $$
 
 The original test therefore covered 32 frequency points from 64 kHz to 2.048 MHz.
@@ -47,9 +47,9 @@ Figures 1 through 11 in the source included the device exterior, V.35 interface,
 
 ## 4. Observed Failure
 
-While sweeping all 32 system-clock points at $N\times64$ kHz, the test found that:
+While sweeping all 32 system-clock points at $N \times 64$ kHz, the test found that:
 
-- the tester reported bit errors near $20\times64$ kHz, or approximately 1.28 MHz;
+- the tester reported bit errors near $20 \times 64$ kHz, or approximately 1.28 MHz;
 - the other frequencies operated normally.
 
 This was the central problem addressed by the original project.
@@ -69,7 +69,7 @@ The engineer used an oscilloscope to measure the V.35 receive-data and receive-c
 - the phase relationship between receive data and receive clock changed with the system-clock frequency;
 - because the tester used Device 1's system clock as its external clock, the phase of the data transmitted by the tester relative to that clock also changed with frequency;
 - the TDMoP device sampled receive data on the rising edge by default;
-- near $20\times64$ kHz, a data transition occurred close to the receive-clock rising edge, making a 0 liable to be sampled as 1 or a 1 as 0;
+- near $20 \times 64$ kHz, a data transition occurred close to the receive-clock rising edge, making a 0 liable to be sampled as 1 or a 1 as 0;
 - at the other frequency points, data transitions remained farther from the hazardous sampling position, so no bit errors appeared.
 
 The original project therefore identified the cause as follows:
@@ -98,7 +98,7 @@ The original device used the 50 MHz CPLD system clock to sample:
 The period of the 50 MHz reference clock was:
 
 $$
-T_{50\mathrm{M}}=20\ \mathrm{ns}
+T_{50\mathrm{M}} = 20\ \mathrm{ns}
 $$
 
 The original VHDL detected the rising edge of `V35_RCLK_I` in the 50 MHz clock domain. On a detected rising edge, it cleared the 10-bit counter `i_counter_for_v35_rclk_edge_calibration`; on other cycles, it incremented the counter. When any transition of the synchronized `V35_RX_I` was detected and the current measurement had not ended, the design latched the counter value and asserted the completion flag.
@@ -106,7 +106,7 @@ The original VHDL detected the rising edge of `V35_RCLK_I` in the 50 MHz clock d
 The source interpreted the data-transition position relative to the clock as:
 
 $$
-t=i_{\mathrm{counter}}\times20\ \mathrm{ns}
+t = i_{\mathrm{counter}} \times 20\ \mathrm{ns}
 $$
 
 At the minimum frequency of 64 kHz, the period is approximately 15.625 μs, corresponding to about 781 intervals of 20 ns. The original code therefore used a 10-bit counter.
@@ -158,9 +158,9 @@ The CPU first took 10 samples and calculated the mean phase $t$:
 
 | Mean phase interval | TDMoP sampling setting |
 |---|---|
-| $0<t<T/4$ | Falling-edge sampling |
-| $T/4<t<3T/4$ | Rising-edge sampling |
-| $3T/4<t<T$ | Falling-edge sampling |
+| $0 < t < T/4$ | Falling-edge sampling |
+| $T/4 < t < 3T/4$ | Rising-edge sampling |
+| $3T/4 < t < T$ | Falling-edge sampling |
 
 ### 9.2 Periodic Remeasurement During Operation
 
@@ -168,27 +168,27 @@ After the initial decision, the CPU sampled once per second and calculated the m
 
 | Mean phase interval | TDMoP sampling setting |
 |---|---|
-| $0<t<T/12$ | Falling-edge sampling |
-| $T/12<t<4T/12$ | Keep the current setting |
-| $5T/12<t<7T/12$ | Rising-edge sampling |
-| $8T/12<t<11T/12$ | Keep the current setting |
-| $11T/12<t<T$ | Falling-edge sampling |
+| $0 < t < T/12$ | Falling-edge sampling |
+| $T/12 < t < 4T/12$ | Keep the current setting |
+| $5T/12 < t < 7T/12$ | Rising-edge sampling |
+| $8T/12 < t < 11T/12$ | Keep the current setting |
+| $11T/12 < t < T$ | Falling-edge sampling |
 
 The source did not specify how to handle:
 
 $$
-4T/12\le t\le5T/12
+4T/12 \le t \le 5T/12
 $$
 
 $$
-7T/12\le t\le8T/12
+7T/12 \le t \le 8T/12
 $$
 
 It also did not assign equality at the thresholds.
 
 ## 10. Measured 10×64K Example
 
-The source provided an example at $10\times64$ kHz, or 640 kHz.
+The source provided an example at $10 \times 64$ kHz, or 640 kHz.
 
 Repeated CPLD measurements produced phase counts primarily of:
 
@@ -199,25 +199,25 @@ Repeated CPLD measurements produced phase counts primarily of:
 The original project considered this variation acceptable and used the mean:
 
 $$
-0x039=57
+\mathtt{0x039} = 57
 $$
 
 Therefore:
 
 $$
-t=57\times20\ \mathrm{ns}=1140\ \mathrm{ns}=1.14\ \mu\mathrm{s}
+t = 57 \times 20\ \mathrm{ns} = 1140\ \mathrm{ns} = 1.14\ \mu\mathrm{s}
 $$
 
 The period of a 640 kHz clock is:
 
 $$
-T=\frac{1}{640\ \mathrm{kHz}}\approx1562\ \mathrm{ns}
+T = \frac{1}{640\ \mathrm{kHz}} \approx 1562\ \mathrm{ns}
 $$
 
 The result satisfies:
 
 $$
-T/4<t<3T/4
+T/4 < t < 3T/4
 $$
 
 The oscilloscope cursor measured approximately 1.16 μs, differing from the CPLD result by 20 ns. The original project treated this one-cycle difference as normal, and the CPU consequently configured the TDMoP device for rising-edge sampling.

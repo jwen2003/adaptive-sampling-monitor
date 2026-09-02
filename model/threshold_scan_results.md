@@ -1,10 +1,10 @@
 # CPU 候选算法门限扫描结果
 
-场景周期为 `T=120` 个相位计数单位。接受条件为：圆周均值有效、集中度不低于门限、圆周裕量/T 不低于门限。
+场景周期为 $T = 120$ 个相位计数单位。接受条件为：圆周均值有效、集中度不低于门限、圆周裕量 / $T$ 不低于门限。
 
 表中数字为通过门限的场景数，场景总数为 12。
 
-| 最小集中度 \ 最小圆周裕量/T | 0 | 0.005 | 0.01 | 0.025 | 0.05 | 0.1 |
+| 最小集中度 \\ 最小圆周裕量 / $T$ | 0 | 0.005 | 0.01 | 0.025 | 0.05 | 0.1 |
 |---:|---:|---:|---:|---:|---:|---:|
 | 0 | 11 | 8 | 7 | 6 | 5 | 5 |
 | 0.5 | 10 | 8 | 7 | 6 | 5 | 5 |
@@ -17,7 +17,7 @@
 
 ### 仅排除无定义均值
 
-门限：集中度 ≥ `0`，圆周裕量/T ≥ `0`。
+门限：集中度 $\ge 0$，圆周裕量与 $T$ 的比值 $\ge 0$。
 
 接受：`initial_stable_near_rising`, `initial_stable_near_falling`, `initial_stable_near_period_end`, `initial_quarter_boundary_jitter`, `initial_wraparound_cluster`, `initial_single_outlier`, `periodic_explicit_keep_region`, `periodic_undocumented_gap`, `initial_opposite_bimodal`, `initial_high_concentration_low_margin`, `periodic_batches_near_threshold`
 
@@ -25,7 +25,7 @@
 
 ### 宽松观察
 
-门限：集中度 ≥ `0.8`，圆周裕量/T ≥ `0.01`。
+门限：集中度 $\ge 0.8$，圆周裕量与 $T$ 的比值 $\ge 0.01$。
 
 接受：`initial_stable_near_rising`, `initial_stable_near_falling`, `initial_stable_near_period_end`, `initial_wraparound_cluster`, `initial_single_outlier`, `periodic_explicit_keep_region`, `periodic_undocumented_gap`
 
@@ -33,7 +33,7 @@
 
 ### 中等观察
 
-门限：集中度 ≥ `0.9`，圆周裕量/T ≥ `0.025`。
+门限：集中度 $\ge 0.9$，圆周裕量与 $T$ 的比值 $\ge 0.025$。
 
 接受：`initial_stable_near_rising`, `initial_stable_near_falling`, `initial_stable_near_period_end`, `initial_wraparound_cluster`, `periodic_explicit_keep_region`, `periodic_undocumented_gap`
 
@@ -41,7 +41,7 @@
 
 ### 严格观察
 
-门限：集中度 ≥ `0.99`，圆周裕量/T ≥ `0.05`。
+门限：集中度 $\ge 0.99$，圆周裕量与 $T$ 的比值 $\ge 0.05$。
 
 接受：`initial_stable_near_rising`, `initial_stable_near_falling`, `initial_stable_near_period_end`, `initial_wraparound_cluster`, `periodic_explicit_keep_region`
 

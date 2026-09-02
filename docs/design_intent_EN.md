@@ -40,7 +40,7 @@ Synchronize both asynchronous inputs through identical two-stage paths; detect R
 
 ### CPU
 
-Start transactions while idle, wait for each completion, read and clear each result, form the required 10-sample initial or 3-sample periodic statistic, apply the appropriate `t/T` decision regions, and configure or retain the TDMoP sampling edge.
+Start transactions while idle, wait for each completion, read and clear each result, form the required 10-sample initial or 3-sample periodic statistic, apply the appropriate $t/T$ decision regions, and configure or retain the TDMoP sampling edge.
 
 ### TDMoP
 
@@ -51,7 +51,7 @@ Sample the actual V.35 data on the CPU-selected rising or falling edge.
 The result is a difference between two internally observable sample indices:
 
 $$
-C_{phase}=n_d-n_r,\qquad t=C_{phase}\times20\text{ ns}
+C_{\mathrm{phase}} = n_d - n_r,\qquad t = C_{\mathrm{phase}} \times 20\text{ ns}
 $$
 
 It is not an exact continuous-time phase. Two-stage synchronization reduces metastability-propagation risk but cannot eliminate metastability, preserve sub-cycle ordering, or recover an even number of DATA transitions between reference-clock samples.
@@ -74,9 +74,9 @@ After power-up or a frequency change, software collects 10 valid phase results a
 
 | Mean phase | Action |
 |---|---|
-| `0<t<T/4` | Select falling-edge sampling. |
-| `T/4<t<3T/4` | Select rising-edge sampling. |
-| `3T/4<t<T` | Select falling-edge sampling. |
+| $0 < t < T/4$ | Select falling-edge sampling. |
+| $T/4 < t < 3T/4$ | Select rising-edge sampling. |
+| $3T/4 < t < T$ | Select falling-edge sampling. |
 
 ### 7.2 Periodic calibration
 
@@ -84,17 +84,17 @@ During operation, software obtains one result at approximately 1 s intervals. Th
 
 | Mean phase | Action |
 |---|---|
-| `0<t<T/12` | Select falling-edge sampling. |
-| `T/12<t<4T/12` | Retain the current setting. |
-| `5T/12<t<7T/12` | Select rising-edge sampling. |
-| `8T/12<t<11T/12` | Retain the current setting. |
-| `11T/12<t<T` | Select falling-edge sampling. |
+| $0 < t < T/12$ | Select falling-edge sampling. |
+| $T/12 < t < 4T/12$ | Retain the current setting. |
+| $5T/12 < t < 7T/12$ | Select rising-edge sampling. |
+| $8T/12 < t < 11T/12$ | Retain the current setting. |
+| $11T/12 < t < T$ | Select falling-edge sampling. |
 
 ### 7.3 Reconstruction decisions and open points
 
 - The phrase “sample once every 1 s and average three samples” is reconstructed as a 1 s interval and non-overlapping three-sample batches.
 - A three-point sliding window is not used because the source does not mention “the latest three” or sliding updates.
-- The undocumented intervals `4T/12<=t<=5T/12`, `7T/12<=t<=8T/12`, and all exact thresholds retain the current setting in the executable reference model.
+- The undocumented intervals $4T/12 \le t \le 5T/12$, $7T/12 \le t \le 8T/12$, and all exact thresholds retain the current setting in the executable reference model.
 - Frequency-change detection and the start time of the first periodic sample remain unknown.
 
 ## 8. Result interface
@@ -141,6 +141,6 @@ All four functional blocks and the top-level integration have self-checking test
 
 ## 12. CPU algorithm exploration decision
 
-The legacy arithmetic mean remains the compatibility reference, but directed scenarios demonstrate that it can misinterpret samples clustered across the `0/T` wrap. The candidate enhancement uses a circular mean and independently checks circular concentration and normalized distance to the nearest effective decision boundary.
+The legacy arithmetic mean remains the compatibility reference, but directed scenarios demonstrate that it can misinterpret samples clustered across the $0/T$ wrap. The candidate enhancement uses a circular mean and independently checks circular concentration and normalized distance to the nearest effective decision boundary.
 
-If confidence is insufficient during initial calibration, the candidate publishes no new edge and requests another calibration attempt. During periodic calibration, it retains the current edge. The exploratory values `concentration >= 0.9` and `circular margin / T >= 0.025` are comparison parameters only, not product requirements. See `cpu_algorithm_exploration_EN.md` for evidence, limitations, and resume conditions.
+If confidence is insufficient during initial calibration, the candidate publishes no new edge and requests another calibration attempt. During periodic calibration, it retains the current edge. The exploratory values concentration $\ge 0.9$ and circular margin divided by $T$ $\ge 0.025$ are comparison parameters only, not product requirements. See `cpu_algorithm_exploration_EN.md` for evidence, limitations, and resume conditions.

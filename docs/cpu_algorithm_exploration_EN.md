@@ -19,7 +19,7 @@ This document records the reconstructed historical CPU decision algorithm, its e
 
 ## 3. Where the historical algorithm is adequate
 
-When the samples form a stable, unimodal distribution that does not cross the `0/T` wrap, the arithmetic and circular means produce the same decision. The historical algorithm is therefore not universally wrong. Its main limitations arise from the circular nature of phase and from abnormal distributions.
+When the samples form a stable, unimodal distribution that does not cross the $0/T$ wrap, the arithmetic and circular means produce the same decision. The historical algorithm is therefore not universally wrong. Its main limitations arise from the circular nature of phase and from abnormal distributions.
 
 ## 4. Reproduced failure modes
 
@@ -43,9 +43,9 @@ High concentration says that the measurements are stable, not that the edge deci
 ## 5. Two confidence metrics
 
 - **Circular concentration** describes how tightly phase samples cluster on the circle and ranges from 0 to 1.
-- **Normalized circular decision margin** is the circular distance from the circular mean to the nearest effective boundary at which the final sampling edge would change, divided by the period `T`.
+- **Normalized circular decision margin** is the circular distance from the circular mean to the nearest effective boundary at which the final sampling edge would change, divided by the period $T$.
 
-`0/T` is a numerical wrap point, not an initial-calibration decision boundary. Because periodic calibration contains retain regions, its effective boundaries depend on the current sampling edge.
+$0/T$ is a numerical wrap point, not an initial-calibration decision boundary. Because periodic calibration contains retain regions, its effective boundaries depend on the current sampling edge.
 
 ## 6. Candidate guarded policy
 
@@ -78,7 +78,7 @@ The confidence gate reduces low-evidence switching at the cost of a slower respo
 
 [Established]
 
-- The historical arithmetic mean cannot correctly represent a distribution crossing the `0/T` wrap.
+- The historical arithmetic mean cannot correctly represent a distribution crossing the $0/T$ wrap.
 - Concentration and decision margin describe statistical credibility and decision separation respectively; neither replaces the other.
 - Periodic retain regions suppress repeated switching, but can also preserve a switch caused by a transient excursion.
 - The candidate enhancement requires no change to CPLD RTL v1.0.

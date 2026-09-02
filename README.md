@@ -41,11 +41,11 @@ flowchart TD
 The measured quantity is a reference-clock sample-index difference:
 
 $$
-C_{phase}=n_d-n_r
+C_{\mathrm{phase}} = n_d - n_r
 $$
 
 $$
-t=C_{phase}\times20\text{ ns}
+t = C_{\mathrm{phase}} \times 20\text{ ns}
 $$
 
 where `n_r` is the most recent observable RCLK rising-event cycle and `n_d` is the first observable DATA-transition cycle that completes the transaction.
@@ -193,7 +193,7 @@ Key waveforms have also been manually inspected.
 
 [Not yet verified]
 
-- Full regression at 64 kHz, 2.048 MHz, and all nominal `N=1..32` frequencies.
+- Full regression at 64 kHz, 2.048 MHz, and all nominal $N = 1,\ldots,32$ frequencies.
 - Directed behavior near 10-bit counter wrap.
 - Long missing-clock and missing-data cases.
 

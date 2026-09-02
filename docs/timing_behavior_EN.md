@@ -12,7 +12,7 @@ All functional decisions occur on rising edges of `clk_50m`; one cycle is 20 ns.
 The measured value is:
 
 $$
-C_{phase}=n_d-n_r,\qquad t=C_{phase}\times20\text{ ns}
+C_{\mathrm{phase}} = n_d - n_r,\qquad t = C_{\mathrm{phase}} \times 20\text{ ns}
 $$
 
 `n_r` is the cycle of the most recent observable RCLK rising event in the active window; `n_d` is the cycle of the first subsequent observable DATA transition.

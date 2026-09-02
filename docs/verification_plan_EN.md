@@ -39,7 +39,7 @@ Digital simulation does not prove metastability probability, board-level margin,
 The scoreboard rule is based on event indices rather than copying the DUT counter update code:
 
 $$
-C_{phase}=n_d-n_r
+C_{\mathrm{phase}} = n_d - n_r
 $$
 
 Same-cycle events return 0; adjacent cycles return 1; a new RCLK replaces `n_r`; DATA without a valid `n_r` produces no result.
@@ -82,7 +82,7 @@ Same-cycle events return 0; adjacent cycles return 1; a new RCLK replaces `n_r`;
 
 ### Synchronization and frequency
 
-The plan includes stable-input behavior, RCLK rise-only detection, DATA either-polarity detection, one-cycle pulses, and allowance for a one-cycle observation shift near a sampling boundary. Frequency regression is planned at 64 kHz, 2.048 MHz, and nominal `N = 1..32` points.
+The plan includes stable-input behavior, RCLK rise-only detection, DATA either-polarity detection, one-cycle pulses, and allowance for a one-cycle observation shift near a sampling boundary. Frequency regression is planned at 64 kHz, 2.048 MHz, and nominal $N = 1,\ldots,32$ points.
 
 ## 6. Assertion intent
 
@@ -133,18 +133,18 @@ It is not accepted as proof of analog correctness, exhaustive frequency coverage
 The executable CPU model verifies that:
 
 1. initial calibration publishes no decision before 10 valid results;
-2. the 10-sample statistic follows the `T/4` and `3T/4` initial regions;
+2. the 10-sample statistic follows the $T/4$ and $3T/4$ initial regions;
 3. periodic sampling uses 1 s intervals and non-overlapping batches of exactly three results;
 4. periodic decisions select rising, select falling, or retain the current edge according to the historical table;
 5. undocumented gaps and exact thresholds retain the current setting;
 6. a completed three-sample batch is cleared rather than becoming a sliding window;
 7. invalid results do not enter a batch, and a frequency change discards partial history;
-8. directed `0/T` distributions expose the physical error of an ordinary arithmetic mean.
+8. directed $0/T$ distributions expose the physical error of an ordinary arithmetic mean.
 
 The first historical-algorithm test set contains 11 tests, all passing. The complete Python suite now contains 33 passing tests and additionally covers circular mean, concentration, ordinary and circular decision margins, threshold sweeps, guarded final actions, and dynamic tracking.
 
 ## 11. CPU algorithm scenario status
 
-Covered scenarios include stable phase, `0/T` wrap, one distant sample, wide dispersion, opposite bimodality, high concentration with low margin, repeated threshold motion, slow crossing, fast jump, noisy crossing, and a transient crossing followed by retreat.
+Covered scenarios include stable phase, $0/T$ wrap, one distant sample, wide dispersion, opposite bimodality, high concentration with low margin, repeated threshold motion, slow crossing, fast jump, noisy crossing, and a transient crossing followed by retreat.
 
 The exploratory gate uses concentration at least `0.9` and normalized circular margin at least `0.025`. Passing these tests proves consistency with the reconstructed and exploratory rules only. It does not establish that these thresholds improve real-hardware BER or satisfy product response-time requirements.
