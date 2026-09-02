@@ -86,7 +86,7 @@ During operation, software obtains one result at approximately 1 s intervals. Th
 |---|---|
 | $0 < t < T/12$ | Select falling-edge sampling. |
 | $T/12 < t < 4T/12$ | Retain the current setting. |
-| $5T/12 < t < 7T/12$ | Select rising-edge sampling. |
+| $`5T/12 < t < 7T/12`$ | Select rising-edge sampling. |
 | $8T/12 < t < 11T/12$ | Retain the current setting. |
 | $11T/12 < t < T$ | Select falling-edge sampling. |
 
@@ -94,7 +94,7 @@ During operation, software obtains one result at approximately 1 s intervals. Th
 
 - The phrase “sample once every 1 s and average three samples” is reconstructed as a 1 s interval and non-overlapping three-sample batches.
 - A three-point sliding window is not used because the source does not mention “the latest three” or sliding updates.
-- The undocumented intervals $4T/12 \le t \le 5T/12$, $7T/12 \le t \le 8T/12$, and all exact thresholds retain the current setting in the executable reference model.
+- The undocumented intervals $`4T/12 \le t \le 5T/12`$, $`7T/12 \le t \le 8T/12`$, and all exact thresholds retain the current setting in the executable reference model.
 - Frequency-change detection and the start time of the first periodic sample remain unknown.
 
 ## 8. Result interface

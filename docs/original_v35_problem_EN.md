@@ -170,7 +170,7 @@ After the initial decision, the CPU sampled once per second and calculated the m
 |---|---|
 | $0 < t < T/12$ | Falling-edge sampling |
 | $T/12 < t < 4T/12$ | Keep the current setting |
-| $5T/12 < t < 7T/12$ | Rising-edge sampling |
+| $`5T/12 < t < 7T/12`$ | Rising-edge sampling |
 | $8T/12 < t < 11T/12$ | Keep the current setting |
 | $11T/12 < t < T$ | Falling-edge sampling |
 
@@ -233,7 +233,7 @@ The original program had been tested and could stably report phase values.
 The following items were incomplete or internally inconsistent in the source. This document records them without resolving them:
 
 1. The continuous-calibration algorithm first appeared in the body as `5/12T < t < 712T`, but was repeated near the end as `5/12T < t < 7/12T`. The latter is dimensionally and contextually reasonable and is used in the table, while the apparent typo is still recorded here.
-2. The continuous-calibration algorithm omitted the intervals from $4T/12$ to $5T/12$ and from $7T/12$ to $8T/12$, and did not define equality at any threshold.
+2. The continuous-calibration algorithm omitted the intervals from $`4T/12`$ to $`5T/12`$ and from $`7T/12`$ to $`8T/12`$, and did not define equality at any threshold.
 3. The source stated that writing `mem13(3)` from 1 to 0 started a measurement, while the original VHDL sampled `mem13(3)` into an internal enable signal upon detecting a receive-clock rising edge. Their exact cycle-by-cycle relationship cannot be fully determined from the prose alone.
 4. The original code had no explicit reset port; some signals depended on declaration-time initial values or subsequent control behavior.
 5. The original code did not define timeout, counter saturation, counter-wrap reporting, or abnormal status.

@@ -83,7 +83,7 @@ Date: 2026-08-20
 | REQ-CPU-005 | Baseline | During operation, the CPU obtains one result at 1 s intervals and uses the mean of three results for periodic calibration. |
 | REQ-CPU-006 | Implementation decision | Periodic samples use non-overlapping batches; after every three results, software decides and starts a new batch. |
 | REQ-CPU-007 | Baseline | The periodic table may select rising, select falling, or retain the current edge; retain regions cause no switch. |
-| REQ-CPU-008 | Implementation decision | The undocumented intervals $4T/12 \le t \le 5T/12$, $7T/12 \le t \le 8T/12$, and all exact thresholds retain the current setting. |
+| REQ-CPU-008 | Implementation decision | The undocumented intervals $`4T/12 \le t \le 5T/12`$, $`7T/12 \le t \le 8T/12`$, and all exact thresholds retain the current setting. |
 | REQ-CPU-009 | Baseline | Multi-sample scheduling, statistics, and TDMoP configuration remain outside the CPLD RTL. |
 | REQ-CPU-010 | Open | How frequency changes are detected and when the first periodic sample is taken. |
 
